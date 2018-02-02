@@ -51,14 +51,11 @@
       <HintPath>..\packages\Zebble.4.4.102\lib\MonoAndroid10\Zebble.Android.dll</HintPath>
     </Reference>
     <Reference Include="Zebble.BoxShadow.Android, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zebble.BoxShadow.1.2.103\lib\MonoAndroid10\Zebble.BoxShadow.Android.dll</HintPath>
+      <HintPath>..\packages\Zebble.BoxShadow.1.2.104\lib\MonoAndroid10\Zebble.BoxShadow.Android.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Zebble.exe" />
   </ItemGroup>
   <Import Project="..\Shared\Shared.projitems" Label="Shared" Condition="Exists('..\Shared\Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

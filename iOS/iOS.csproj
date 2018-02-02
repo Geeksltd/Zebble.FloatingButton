@@ -44,7 +44,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="Zebble.BoxShadow.iOS, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zebble.BoxShadow.1.2.103\lib\Xamarin.iOS10\Zebble.BoxShadow.iOS.dll</HintPath>
+      <HintPath>..\packages\Zebble.BoxShadow.1.2.104\lib\Xamarin.iOS10\Zebble.BoxShadow.iOS.dll</HintPath>
     </Reference>
     <Reference Include="Zebble.iOS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Zebble.4.4.102\lib\Xamarin.iOS10\Zebble.iOS.dll</HintPath>
