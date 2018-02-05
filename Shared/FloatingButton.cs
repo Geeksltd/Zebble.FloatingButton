@@ -187,6 +187,9 @@
             var lastItemTop = Y.CurrentValue;
             var lastItemLeft = X.CurrentValue;
             Source.Update();
+
+            List<Task> animations = new List<Task>();
+
             foreach (var actionItem in Source.ActionButtons)
             {
                 actionItem.ZIndex(ZIndex - 1);
@@ -212,9 +215,17 @@
                 }
 
                 CurrentActionItems.Add(actionItem);
-                await Nav.CurrentPage.AddWithAnimation(actionItem, child => { child.X(lastItemLeft); child.Y(lastItemTop); });
-                await Task.Delay(100);
+                actionItem.X(lastItemLeft).Y(lastItemTop).ScaleX(0).ScaleY(0);
+
+                animations.Add(Nav.CurrentPage.AddWithAnimation(actionItem, new Animation
+                {
+                    Change = () => actionItem.ScaleX(1).ScaleY(1),
+                    Duration = 100.Milliseconds(),
+                    Easing = AnimationEasing.EaseInOut
+                }));
             }
+
+            await Task.WhenAll(animations);
 
             IsActionItemsShowing = true;
         }
@@ -223,12 +234,15 @@
         {
             if (!IsActionItemsShowing) return;
 
+            List<Task> animations = new List<Task>();
+
             foreach (var actionItem in CurrentActionItems)
             {
-                await actionItem.Animate(child => { child.X(X.CurrentValue); child.Y(Y.CurrentValue); });
-                await Task.Delay(50);
-                await Nav.CurrentPage.Remove(actionItem);
+                animations.Add(actionItem.Animate(100.Milliseconds(), AnimationEasing.EaseInOut, child => child.ScaleX(0).ScaleY(0))
+                      .ContinueWith(async (a) => await Nav.CurrentPage.Remove(actionItem)));
             }
+
+            await Task.WhenAll(animations);
 
             IsActionItemsShowing = false;
         }
