@@ -17,11 +17,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ActionButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ActionButtonAlignment.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ActionButtonCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ActionButtonAlignments.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatingButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignment.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ButtonSize.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignments.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)FloatingButton.scss" />
   </ItemGroup>
 </Project>

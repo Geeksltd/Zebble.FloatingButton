@@ -2,7 +2,7 @@
 {
     public partial class FloatingButton
     {
-        public enum ButtonAlignment
+        public enum ButtonAlignments
         {
             TopRight,
             TopLeft,

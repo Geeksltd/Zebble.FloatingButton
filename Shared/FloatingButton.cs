@@ -5,100 +5,25 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    public partial class FloatingButton : Canvas
+    public partial class FloatingButton : FloatingButtonBase
     {
-        float MINI_SIZE = 40;
-        float BIG_SIZE = 56;
-        float BTN_SIZE = 24;
-        float BIG_PADDING = 14;
-        float MINI_PADDING = 6;
+        bool IsInitializedWithMarkup;
 
-        readonly Button Button = new Button();
-
-        protected float CONTAINER_MARGIN = 10;
+        public List<ActionButton> ActionButtons { get; set; }
 
         public bool IsShowing { get; set; }
 
-        ButtonSize? buttonSize;
-        public ButtonSize? Size
+        public bool IsActionItemsShowing { get; set; }
+
+        public ActionButtonAlignments ActionButtonAlignment { get; set; } = ActionButtonAlignments.Top;
+
+        public FloatingButton() { ActionButtons = new List<ActionButton>(); Visible = IsInitializedWithMarkup = true; }
+
+        public FloatingButton(ActionButtonAlignments actionButtonAlignment, params ActionButton[] actionItems)
         {
-            get { return buttonSize; }
-            set
-            {
-                buttonSize = value;
-                if (buttonSize == ButtonSize.Small)
-                    this.Width(MINI_SIZE).Height(MINI_SIZE).Border(all: 1, radius: MINI_SIZE).Padding(all: MINI_PADDING);
-                else
-                    this.Width(BIG_SIZE).Height(BIG_SIZE).Border(all: 1, radius: BIG_SIZE).Padding(all: BIG_PADDING);
-
-                Button.Width(BTN_SIZE).Height(BTN_SIZE);
-            }
-        }
-
-        public Color Color
-        {
-            get { return BackgroundColor; }
-            set
-            {
-                if (BackgroundColor == value) return;
-
-                BackgroundColor = value;
-                this.Border(color: value);
-            }
-        }
-
-        public string ImagePath
-        {
-            get { return Button.BackgroundImagePath; }
-            set
-            {
-                if (Button.BackgroundImagePath == value) return;
-                Button.BackgroundImagePath = value;
-            }
-        }
-
-        ButtonAlignment buttonAlignment;
-        public ButtonAlignment Alignment
-        {
-            get { return buttonAlignment; }
-            set
-            {
-                buttonAlignment = value;
-                UpdatePosition();
-            }
-        }
-
-        Color shadowColor;
-        public Color ShadowColor
-        {
-            get { return shadowColor; }
-            set
-            {
-                if (shadowColor == value) return;
-
-                shadowColor = value;
-                this.BoxShadow(1, 1, 5, shadowColor);
-            }
-        }
-
-        public async override Task OnInitializing()
-        {
-            await base.OnInitializing();
-
-            Button.Tapped.Handle(Tapped.Raise);
-            Button.Padding(all: 0);
-            Button.BackgroundColor = Colors.Transparent;
-
-            if (Size == null) Size = ButtonSize.Small;
-            if (Color == Colors.Transparent) Color = Colors.Pink;
-            if (ShadowColor == Colors.Transparent) ShadowColor = Colors.Silver;
-
-            var maxZindex = Nav.CurrentPage.AllDescendents().Except(d => d is FloatingButton).Max(c => c.ZIndex);
-            Id = "FloatingButton".WithSuffix(Id);
-            Tapped.Handle(() => { Button.Flash(); });
-            this.Absolute().ZIndex(maxZindex + 1);
-
-            await Add(Button);
+            ActionButtonAlignment = actionButtonAlignment;
+            ActionButtons = new List<ActionButton>(actionItems);
+            Visible = true;
         }
 
         public virtual async Task Show()
@@ -106,7 +31,16 @@
             UpdatePosition();
             if (IsShowing) return;
 
-            await Nav.CurrentPage.Add(this);
+            if (Parent != null && Parent.AllChildren.Contains(this))
+                Visible = true;
+            else
+            {
+                if (Nav.CurrentPage.AllChildren.Contains(this))
+                    Visible = true;
+                else
+                    await Nav.CurrentPage.Add(this);
+            }
+
             IsShowing = true;
         }
 
@@ -114,55 +48,13 @@
         {
             if (!IsShowing) return;
 
-            await Nav.CurrentPage.Remove(this);
+            Visible = false;
             IsShowing = false;
-        }
-
-        protected virtual void UpdatePosition()
-        {
-            switch (Alignment)
-            {
-                default:
-                case ButtonAlignment.BottomRight:
-                    X.BindTo(Root.Width, Width, Margin.Right, (rw, fbw, mr) => rw - (fbw + mr + CONTAINER_MARGIN));
-                    Y.BindTo(Root.Height, Height, Margin.Bottom, (rh, fbh, mb) => rh - (fbh + mb + CONTAINER_MARGIN));
-                    break;
-                case ButtonAlignment.BottomLeft:
-                    X.BindTo(Margin.Left, ml => ml + CONTAINER_MARGIN);
-                    Y.BindTo(Root.Height, Height, Margin.Bottom, (rh, fbh, mb) => rh - (fbh + mb + CONTAINER_MARGIN));
-                    break;
-                case ButtonAlignment.TopLeft:
-                    X.BindTo(Margin.Left, ml => ml + CONTAINER_MARGIN);
-                    Y.BindTo(Margin.Top, mt => mt + CONTAINER_MARGIN);
-                    break;
-                case ButtonAlignment.TopRight:
-                    X.BindTo(Root.Width, Width, Margin.Right, (rw, fbw, mr) => rw - (fbw + mr + CONTAINER_MARGIN));
-                    Y.BindTo(Margin.Top, mt => mt + CONTAINER_MARGIN);
-                    break;
-                case ButtonAlignment.Custom:
-                    break;
-            }
-        }
-    }
-
-    public class FloatingButton<TActionButtonCollection> : FloatingButton where TActionButtonCollection : FloatingButton.ActionButtonCollection
-    {
-        readonly List<FloatingButton> CurrentActionItems = new List<FloatingButton>();
-
-        public TActionButtonCollection Source { get; set; }
-
-        public bool IsActionItemsShowing { get; set; }
-
-        public async override Task OnInitializing()
-        {
-            await base.OnInitializing();
-
-            Shown.Handle(() => this.ZIndex(CurrentActionItems.MaxOrNull(f => f.ZIndex) ?? ZIndex + 1));
         }
 
         public async Task ShowAsActionMenu()
         {
-            if (Source == null)
+            if (ActionButtons == null)
             {
                 Device.Log.Error("ActionButton source is null");
                 return;
@@ -170,7 +62,6 @@
 
             UpdatePosition();
 
-            Size = ButtonSize.Big;
             Tapped.Handle(ShowActionItems);
 
             await Show();
@@ -184,45 +75,56 @@
                 return;
             }
 
-            var lastItemTop = Y.CurrentValue;
-            var lastItemLeft = X.CurrentValue;
-            Source.Update();
+            float lastItemTop = 0, lastItemLeft = 0;
 
-            List<Task> animations = new List<Task>();
+            if (!IsInitializedWithMarkup)
+            {
+                lastItemTop = Y.CurrentValue;
+                lastItemLeft = X.CurrentValue;
+            }
 
-            foreach (var actionItem in Source.ActionButtons)
+            var animations = new List<Task>();
+
+            foreach (var actionItem in ActionButtons)
             {
                 actionItem.ZIndex(ZIndex - 1);
-                actionItem.Y(Y.CurrentValue);
-                actionItem.X(X.CurrentValue);
-
-                switch (Source.Alignment)
+                if (!IsInitializedWithMarkup)
                 {
-                    case ActionButtonAlignment.Top:
+                    actionItem.Y(Y.CurrentValue);
+                    actionItem.X(X.CurrentValue);
+                }
+
+                if (actionItem.Parent == null)
+                    await Nav.CurrentPage.Add(actionItem);
+
+                switch (ActionButtonAlignment)
+                {
+                    case ActionButtonAlignments.Top:
                         lastItemTop -= actionItem.ActualHeight + CONTAINER_MARGIN;
                         break;
-                    case ActionButtonAlignment.Right:
+                    case ActionButtonAlignments.Right:
                         lastItemLeft += actionItem.ActualWidth + CONTAINER_MARGIN;
                         break;
-                    case ActionButtonAlignment.Bottom:
+                    case ActionButtonAlignments.Bottom:
                         lastItemTop += actionItem.ActualHeight + CONTAINER_MARGIN;
                         break;
-                    case ActionButtonAlignment.Left:
+                    case ActionButtonAlignments.Left:
                         lastItemLeft -= actionItem.ActualWidth + CONTAINER_MARGIN;
                         break;
                     default:
                         break;
                 }
 
-                CurrentActionItems.Add(actionItem);
                 actionItem.X(lastItemLeft).Y(lastItemTop).ScaleX(0).ScaleY(0);
-
-                animations.Add(Nav.CurrentPage.AddWithAnimation(actionItem, new Animation
+                var animation = new Animation
                 {
                     Change = () => actionItem.ScaleX(1).ScaleY(1),
                     Duration = 100.Milliseconds(),
                     Easing = AnimationEasing.EaseInOut
-                }));
+                };
+
+                animations.Add(actionItem.Animate(animation));
+                actionItem.Visible = true;
             }
 
             await Task.WhenAll(animations);
@@ -234,17 +136,39 @@
         {
             if (!IsActionItemsShowing) return;
 
-            List<Task> animations = new List<Task>();
+            var animations = new List<Task>();
 
-            foreach (var actionItem in CurrentActionItems)
+            foreach (var actionItem in ActionButtons)
             {
                 animations.Add(actionItem.Animate(100.Milliseconds(), AnimationEasing.EaseInOut, child => child.ScaleX(0).ScaleY(0))
-                      .ContinueWith(async (a) => await Nav.CurrentPage.Remove(actionItem)));
+                      .ContinueWith((a) => actionItem.Visible = false));
             }
 
             await Task.WhenAll(animations);
 
             IsActionItemsShowing = false;
+        }
+
+        public override async Task OnInitialized()
+        {
+            await base.OnInitialized();
+
+            if (IsInitializedWithMarkup)
+            {
+                await Show();
+                if (ActionButtons.Any())
+                    await ShowAsActionMenu();
+            }
+        }
+
+        public override async Task<TView> Add<TView>(TView child, bool awaitNative = false)
+        {
+            var result = await base.Add(child, awaitNative);
+            var actionButton = result as ActionButton;
+            if (actionButton != null)
+                ActionButtons.Add(actionButton);
+
+            return result;
         }
     }
 }
