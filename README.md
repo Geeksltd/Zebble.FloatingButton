@@ -29,8 +29,7 @@ If you need to add a stand alone floating button without action menus, you can u
 var floatBtn = new FloatingButton
 {
     ImagePath = "Image url",
-    Color = Colors.Gray,
-    Size = FloatingButton.ButtonSize.Big,
+    BackgroundColor = Colors.Gray,
     Alignment = FloatingButton.ButtonAlignment.BottomRight
 };
 ```
@@ -43,25 +42,36 @@ public async override Task OnInitializing()
     var floatBtn = new FloatingButton
     {
         ImagePath = "Images/Icons/Share.png",
-        Color = Colors.Gray,
-        Size = FloatingButton.ButtonSize.Big,
-        Alignment = FloatingButton.ButtonAlignment.BottomRight
+        BackgroundColor = Colors.Gray,
+        Alignment = FloatingButton.ButtonAlignments.BottomRight
     };
 
     await floatBtn.Show();
 }
 ```
+Or you can add `FloatingButton` to the page with Zebble markup like below:
+```xml
+<z-Component z-type="Page1" z-base="Templates.Default" z-namespace="UI.Pages"
+    Title="Page 1" data-TopMenu="MainMenu" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="./../.zebble-schema.xml">
 
+  <z-place inside="Body">
+    ...
+    ...
+  </z-place>
+
+  <FloatingButton ImagePath="Images/Icons/Share.png" />
+
+</z-Component>
+```
 ##### FloatingButton with action menu item :
-To add menu item to `FloatingButton` you need to use `Zebble.FloatingButton<FloatingButton.ActionButtonCollection>` like below:
+To add menu item to `FloatingButton` you need to use `Zebble.FloatingButton` like below:
 ```csharp
-var floatBtn = new FloatingButton<FloatingButton.ActionButtonCollection>
+var floatBtn = new FloatingButton(FloatingButton.ActionButtonAlignments.Top, menuItem1, menuItem2)
 {
     ImagePath = "Images/Icons/Share.png",
-    Color = Colors.Gray,
-    Size = FloatingButton.ButtonSize.Big,
-    Alignment = FloatingButton.ButtonAlignment.BottomRight,
-    Source = new FloatingButton.ActionButtonCollection(FloatingButton.ActionButtonAlignment.Top, menuItem1, menuItem2, menuItem3)
+    BackgroundColor = Colors.Gray,
+    Alignment = FloatingButton.ButtonAlignments.BottomRight
 };
 ```
 To show floating button with action menu items you need to call `floatBtn.ShowAsActionMenu()` method:
@@ -70,22 +80,37 @@ public async override Task OnInitializing()
 {
     await base.OnInitializing();
 
-    var menuItem1 = new FloatingButton.ActionButton { Color = Colors.LightPink, ImagePath = "Images/Icons/Check.png" };
-    var menuItem2 = new FloatingButton.ActionButton { Color = Colors.HotPink, ImagePath = "Images/Icons/Share.png" };
+    var menuItem1 = new ActionButton { BackgroundColor = Colors.LightPink, ImagePath = "Images/Icons/Check.png" };
+    var menuItem2 = new ActionButton { BackgroundColor = Colors.HotPink, ImagePath = "Images/Icons/Share.png" };
 
-    var floatBtn = new FloatingButton<FloatingButton.ActionButtonCollection>
+    var floatBtn = new FloatingButton(FloatingButton.ActionButtonAlignments.Top, menuItem1, menuItem2)
     {
         ImagePath = "Images/Icons/Share.png",
-        Color = Colors.Gray,
-        Size = FloatingButton.ButtonSize.Big,
-        Alignment = FloatingButton.ButtonAlignment.BottomRight,
-        Source = new FloatingButton.ActionButtonCollection(FloatingButton.ActionButtonAlignment.Top, menuItem1, menuItem2)
+        BackgroundColor = Colors.Gray,
+        Alignment = FloatingButton.ButtonAlignments.BottomRight
     };
 
     await floatBtn.ShowAsActionMenu();
 }
 ```
+Or using Zebble markup:
+```xml
+<z-Component z-type="Page1" z-base="Templates.Default" z-namespace="UI.Pages"
+    Title="Page 1" data-TopMenu="MainMenu" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="./../.zebble-schema.xml">
 
+  <z-place inside="Body">
+    ...
+    ...
+  </z-place>
+
+  <FloatingButton ImagePath="Images/Icons/Share.png">
+    <ActionButton ImagePath="Images/Icons/Check.png" Style="background: pink;" />
+    <ActionButton ImagePath="Images/Icons/Add.png" Style="background: red;" />
+  </FloatingButton>
+
+</z-Component>
+```
 ##### Hiding FloatingButton:
 ```csharp
 await floatBtn.Hide();
@@ -105,12 +130,11 @@ await floatBtn.HideActionItems();
 | :----------- | :----------- | :------ | :-- | :------ |
 | IsShowing           | bool          | x       | x   | x       |
 | IsActionItemsShowing           | bool          | x       | x   | x       |
-| Size           | FloatingButton.ButtonSize          | x       | x   | x       |
-| Color           | Color          | x       | x   | x       |
 | ImagePath           | bool          | x       | x   | x       |
+| ActionButtonAlignment | ActionButtonAlignments | x       | x   | x       |
 | Alignment           | FloatingButton.ButtonAlignment          | x       | x   | x       |
 | ShadowColor           | Color          | x       | x   | x       |
-| Source           | FloatingButton.ActionButtonCollection          | x       | x   | x       |
+| ActionButtons           | List<ActionButton&gt;          | x       | x   | x       |
 
 <br>
 
@@ -128,5 +152,6 @@ await floatBtn.HideActionItems();
 | :----------- | :----------- | :-----------                        | :------ | :-- | :------ |
 | Show         | Task         | -| x       | x   | x       |
 | Hide  | Task         | -| x       | x   | x       |
+| ShowAsActionMenu  | Task         | -| x       | x   | x       |
 | ShowActionItems  | Task         | -| x       | x   | x       |
 | HideActionItems  | Task         | -| x       | x   | x       |
