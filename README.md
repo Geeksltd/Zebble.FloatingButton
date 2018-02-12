@@ -72,8 +72,8 @@ await floatBtn.ShowAsActionMenu();
 Or simply using Zebble markup:
 ```xml
 <FloatingButton ImagePath="Images/Icons/Share.png">
-    <ActionButton ImagePath="Images/Icons/Check.png" Style="background: pink;" />
-    <ActionButton ImagePath="Images/Icons/Add.png" Style="background: red;" />
+    <FloatingButton.Action ImagePath="Images/Icons/Check.png" Style="background: pink;" />
+    <FloatingButton.Action ImagePath="Images/Icons/Add.png" Style="background: red;" />
 </FloatingButton>
 ```
 <br/>
