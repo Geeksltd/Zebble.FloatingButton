@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    public abstract class FloatingButtonBase : View
+    public abstract class BaseFloatingButton : View
     {
         protected const float CONTAINER_MARGIN = 10;
         readonly Button Button = new Button();
@@ -19,13 +19,13 @@
             }
         }
 
-        FloatingButton.ButtonAlignments buttonAlignment;
-        public FloatingButton.ButtonAlignments Alignment
+        FloatingButtonPosition position;
+        public FloatingButtonPosition Position
         {
-            get { return buttonAlignment; }
+            get { return position; }
             set
             {
-                buttonAlignment = value;
+                position = value;
                 UpdatePosition();
             }
         }
@@ -42,7 +42,7 @@
             }
         }
 
-        protected FloatingButtonBase() { Visible = false; }
+        protected BaseFloatingButton() { Visible = false; }
 
         public override async Task OnInitializing()
         {
@@ -63,26 +63,26 @@
 
         protected virtual void UpdatePosition()
         {
-            switch (Alignment)
+            switch (Position)
             {
                 default:
-                case FloatingButton.ButtonAlignments.BottomRight:
+                case FloatingButtonPosition.BottomRight:
                     X.BindTo(Root.Width, Width, Margin.Right, (rw, fbw, mr) => rw - (fbw + mr + CONTAINER_MARGIN));
                     Y.BindTo(Root.Height, Height, Margin.Bottom, (rh, fbh, mb) => rh - (fbh + mb + CONTAINER_MARGIN));
                     break;
-                case FloatingButton.ButtonAlignments.BottomLeft:
+                case FloatingButtonPosition.BottomLeft:
                     X.BindTo(Margin.Left, ml => ml + CONTAINER_MARGIN);
                     Y.BindTo(Root.Height, Height, Margin.Bottom, (rh, fbh, mb) => rh - (fbh + mb + CONTAINER_MARGIN));
                     break;
-                case FloatingButton.ButtonAlignments.TopLeft:
+                case FloatingButtonPosition.TopLeft:
                     X.BindTo(Margin.Left, ml => ml + CONTAINER_MARGIN);
                     Y.BindTo(Margin.Top, mt => mt + CONTAINER_MARGIN);
                     break;
-                case FloatingButton.ButtonAlignments.TopRight:
+                case FloatingButtonPosition.TopRight:
                     X.BindTo(Root.Width, Width, Margin.Right, (rw, fbw, mr) => rw - (fbw + mr + CONTAINER_MARGIN));
                     Y.BindTo(Margin.Top, mt => mt + CONTAINER_MARGIN);
                     break;
-                case FloatingButton.ButtonAlignments.Custom:
+                case FloatingButtonPosition.Custom:
                     break;
             }
         }

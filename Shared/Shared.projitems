@@ -16,12 +16,12 @@
     <None Include="$(MSBuildThisFileDirectory)NuGet\Icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ActionButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ActionButtonAlignments.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Action.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonFlow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatingButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ButtonAlignments.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonPosition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatingButton.Base.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)FloatingButton.scss" />

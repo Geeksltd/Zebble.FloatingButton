@@ -5,14 +5,14 @@
     [EscapeGCop("Method names are fine")]
     public static class FloatingButtonExtensions
     {
-        public static TView Alignment<TView>(this TView view, FloatingButton.ButtonAlignments value) where TView : FloatingButton
+        public static TView Position<TView>(this TView view, FloatingButtonPosition value) where TView : FloatingButton
         {
-            return view.Set(x => x.Alignment = value);
+            return view.Set(x => x.Position = value);
         }
 
-        public static TView ActionButtonAlignment<TView>(this TView view, FloatingButton.ActionButtonAlignments value) where TView : FloatingButton
+        public static TView Flow<TView>(this TView view, FloatingButtonFlow value) where TView : FloatingButton
         {
-            return view.Set(x => x.ActionButtonAlignment = value);
+            return view.Set(x => x.Flow = value);
         }
 
         public static TView ImagePath<TView>(this TView view, string value) where TView : FloatingButton

@@ -5,24 +5,24 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    public partial class FloatingButton : FloatingButtonBase
+    public partial class FloatingButton : BaseFloatingButton
     {
         bool IsInitializedWithMarkup;
 
-        public List<ActionButton> ActionButtons { get; set; }
+        public List<Action> Actions { get; set; }
 
         public bool IsShowing { get; set; }
 
-        public bool IsActionItemsShowing { get; set; }
+        public bool IsActionsShowing { get; set; }
 
-        public ActionButtonAlignments ActionButtonAlignment { get; set; } = ActionButtonAlignments.Top;
+        public FloatingButtonFlow Flow { get; set; } = FloatingButtonFlow.Top;
 
-        public FloatingButton() { ActionButtons = new List<ActionButton>(); Visible = IsInitializedWithMarkup = true; }
+        public FloatingButton() { Actions = new List<Action>(); Visible = IsInitializedWithMarkup = true; }
 
-        public FloatingButton(ActionButtonAlignments actionButtonAlignment, params ActionButton[] actionItems)
+        public FloatingButton(FloatingButtonFlow flow, params Action[] actionItems)
         {
-            ActionButtonAlignment = actionButtonAlignment;
-            ActionButtons = new List<ActionButton>(actionItems);
+            Flow = flow;
+            Actions = new List<Action>(actionItems);
             Visible = true;
         }
 
@@ -54,7 +54,7 @@
 
         public async Task ShowAsActionMenu()
         {
-            if (ActionButtons == null)
+            if (Actions == null)
             {
                 Device.Log.Error("ActionButton source is null");
                 return;
@@ -62,16 +62,16 @@
 
             UpdatePosition();
 
-            Tapped.Handle(ShowActionItems);
+            Tapped.Handle(ShowActions);
 
             await Show();
         }
 
-        public async Task ShowActionItems()
+        public async Task ShowActions()
         {
-            if (IsActionItemsShowing)
+            if (IsActionsShowing)
             {
-                await HideActionItems();
+                await HideActions();
                 return;
             }
 
@@ -85,7 +85,7 @@
 
             var animations = new List<Task>();
 
-            foreach (var actionItem in ActionButtons)
+            foreach (var actionItem in Actions)
             {
                 actionItem.ZIndex(ZIndex - 1);
                 if (!IsInitializedWithMarkup)
@@ -97,18 +97,18 @@
                 if (actionItem.Parent == null)
                     await Nav.CurrentPage.Add(actionItem);
 
-                switch (ActionButtonAlignment)
+                switch (Flow)
                 {
-                    case ActionButtonAlignments.Top:
+                    case FloatingButtonFlow.Top:
                         lastItemTop -= actionItem.ActualHeight + CONTAINER_MARGIN;
                         break;
-                    case ActionButtonAlignments.Right:
+                    case FloatingButtonFlow.Right:
                         lastItemLeft += actionItem.ActualWidth + CONTAINER_MARGIN;
                         break;
-                    case ActionButtonAlignments.Bottom:
+                    case FloatingButtonFlow.Bottom:
                         lastItemTop += actionItem.ActualHeight + CONTAINER_MARGIN;
                         break;
-                    case ActionButtonAlignments.Left:
+                    case FloatingButtonFlow.Left:
                         lastItemLeft -= actionItem.ActualWidth + CONTAINER_MARGIN;
                         break;
                     default:
@@ -129,16 +129,16 @@
 
             await Task.WhenAll(animations);
 
-            IsActionItemsShowing = true;
+            IsActionsShowing = true;
         }
 
-        public async Task HideActionItems()
+        public async Task HideActions()
         {
-            if (!IsActionItemsShowing) return;
+            if (!IsActionsShowing) return;
 
             var animations = new List<Task>();
 
-            foreach (var actionItem in ActionButtons)
+            foreach (var actionItem in Actions)
             {
                 animations.Add(actionItem.Animate(100.Milliseconds(), AnimationEasing.EaseInOut, child => child.ScaleX(0).ScaleY(0))
                       .ContinueWith((a) => actionItem.Visible = false));
@@ -146,7 +146,7 @@
 
             await Task.WhenAll(animations);
 
-            IsActionItemsShowing = false;
+            IsActionsShowing = false;
         }
 
         public override async Task OnInitialized()
@@ -156,7 +156,7 @@
             if (IsInitializedWithMarkup)
             {
                 await Show();
-                if (ActionButtons.Any())
+                if (Actions.Any())
                     await ShowAsActionMenu();
             }
         }
@@ -164,9 +164,9 @@
         public override async Task<TView> Add<TView>(TView child, bool awaitNative = false)
         {
             var result = await base.Add(child, awaitNative);
-            var actionButton = result as ActionButton;
+            var actionButton = result as Action;
             if (actionButton != null)
-                ActionButtons.Add(actionButton);
+                Actions.Add(actionButton);
 
             return result;
         }
