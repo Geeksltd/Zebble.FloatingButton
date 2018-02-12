@@ -55,19 +55,19 @@ var floatBtn = new FloatingButton(FloatingButtonFlow.Top, menuItem1, menuItem2)
     Position = FloatingButtonPosition.BottomRight
 };
 ```
-To show floating button with action menu items you need to call `floatBtn.ShowAsActionMenu()` method:
+To show floating button with action menu items you need to call `floatBtn.Show()` method:
 ```csharp
 var menuItem1 = new FloatingButton.Action{ BackgroundColor = Colors.LightPink, ImagePath = "Images/Icons/Check.png" };
 var menuItem2 = new FloatingButton.Action{ BackgroundColor = Colors.HotPink, ImagePath = "Images/Icons/Share.png" };
 
-var floatBtn = new FloatingButton(FloatingButton.ActionButtonAlignments.Top, menuItem1, menuItem2)
+var floatBtn = new FloatingButton(FloatingButtonFlow.Top, menuItem1, menuItem2)
 {
     ImagePath = "Images/Icons/Share.png",
     BackgroundColor = Colors.Gray,
-    Alignment = FloatingButton.ButtonAlignments.BottomRight
+    Position = FloatingButtonPosition.BottomRight
 };
 
-await floatBtn.ShowAsActionMenu();
+await floatBtn.Show();
 ```
 Or simply using Zebble markup:
 ```xml
@@ -119,6 +119,5 @@ await floatBtn.HideActions();
 | :----------- | :----------- | :-----------                        | :------ | :-- | :------ |
 | Show         | Task         | -| x       | x   | x       |
 | Hide  | Task         | -| x       | x   | x       |
-| ShowAsActionMenu  | Task         | -| x       | x   | x       |
 | ShowActions  | Task         | -| x       | x   | x       |
 | HideActions  | Task         | -| x       | x   | x       |
