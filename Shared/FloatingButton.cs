@@ -41,6 +41,9 @@
                     await Nav.CurrentPage.Add(this);
             }
 
+            if (Actions != null && Actions.Any())
+                Tapped.Handle(ShowActions);
+
             IsShowing = true;
         }
 
@@ -50,21 +53,6 @@
 
             Visible = false;
             IsShowing = false;
-        }
-
-        public async Task ShowAsActionMenu()
-        {
-            if (Actions == null)
-            {
-                Device.Log.Error("ActionButton source is null");
-                return;
-            }
-
-            UpdatePosition();
-
-            Tapped.Handle(ShowActions);
-
-            await Show();
         }
 
         public async Task ShowActions()
@@ -154,11 +142,7 @@
             await base.OnInitialized();
 
             if (IsInitializedWithMarkup)
-            {
                 await Show();
-                if (Actions.Any())
-                    await ShowAsActionMenu();
-            }
         }
 
         public override async Task<TView> Add<TView>(TView child, bool awaitNative = false)
