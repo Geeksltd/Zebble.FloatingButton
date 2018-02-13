@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Zebble.FloatingButton</id>
-    <version>1.1.100</version>
+    <version>1.1.101</version>
     <title>FloatingButton for Zebble (Xamarin)</title>
     <projectUrl>https://github.com/Geeksltd/Zebble.FloatingButton</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Geeksltd/Zebble.FloatingButton/master/Shared/NuGet/Icon.png</iconUrl>
@@ -16,6 +16,6 @@
     <file src="..\..\lib\Zebble.FloatingButton.iOS.*" target="lib\Xamarin.iOS10\" />
     <file src="..\..\lib\Zebble.FloatingButton.Android.*" target="lib\MonoAndroid10\" />
     <file src="..\..\lib\Zebble.FloatingButton.UWP.*" target="lib\UAP10\" />
-    <file src="..\..\Shared\FloatingButton.scss" target="lib\Css\"/>
+    <file src="..\..\Shared\FloatingButton.scss" target="lib\Css\" />
   </files>
 </package>
