@@ -100,7 +100,6 @@ await floatBtn.HideActions();
 | ImagePath           | bool          | x       | x   | x       |
 | Flow | FloatingButtonFlow | x       | x   | x       |
 | Position           | FloatingButtonPosition          | x       | x   | x       |
-| ShadowColor           | Color          | x       | x   | x       |
 | Actions           | List<Action&gt;          | x       | x   | x       |
 
 <br>

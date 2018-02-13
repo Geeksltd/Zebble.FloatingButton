@@ -1,8 +1,7 @@
 ﻿{
   "dependencies": {
-    "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.6",
-    "Zebble": "4.4.104",
-    "Zebble.BoxShadow": "1.2.105"
+    "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.7",
+    "Zebble": "4.4.104"
   },
   "frameworks": {
     "uap10.0.10240": {}

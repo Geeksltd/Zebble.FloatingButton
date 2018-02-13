@@ -30,18 +30,6 @@
             }
         }
 
-        Color shadowColor;
-        public Color ShadowColor
-        {
-            get { return shadowColor; }
-            set
-            {
-                shadowColor = value;
-                if (Parent != null)
-                    this.BoxShadow(6, 0, 6, color: shadowColor);
-            }
-        }
-
         protected BaseFloatingButton() { Visible = false; }
 
         public override async Task OnInitializing()
@@ -51,8 +39,6 @@
             Button.Tapped.Handle(Tapped.Raise);
             Button.Padding(all: 0);
             Button.BackgroundColor = Colors.Transparent;
-
-            if (ShadowColor == null || ShadowColor == Colors.Transparent) ShadowColor = Colors.Silver;
 
             var maxZindex = Nav.CurrentPage.AllDescendents().Except(d => d is FloatingButton).Max(c => c.ZIndex);
             Tapped.Handle(() => { Button.Flash(); });
