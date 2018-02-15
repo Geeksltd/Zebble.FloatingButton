@@ -5,10 +5,10 @@
     /// </summary>
     public enum FloatingButtonPosition
     {
+        Custom,
         TopRight,
         TopLeft,
         BottomRight,
-        BottomLeft,
-        Custom
+        BottomLeft
     }
 }

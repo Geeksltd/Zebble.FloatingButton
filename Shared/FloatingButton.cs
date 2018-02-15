@@ -7,28 +7,47 @@
 
     public partial class FloatingButton : BaseFloatingButton
     {
-        bool IsInitializedWithMarkup;
+        public List<Action> Actions { get; set; } = new List<Action>();
 
-        public List<Action> Actions { get; set; }
+        public FloatingButtonPosition Position { get; set; } = FloatingButtonPosition.Custom;
+
+        Func<System.Action, Animation> animationFactory;
+
+        public Func<System.Action, Animation> AnimationFactory
+        {
+            get => animationFactory ?? DefaultAnimationFactory;
+            set => animationFactory = value;
+        }
+
+        public int ActionsPadding { get; set; } = 10;
 
         public bool IsShowing { get; set; }
 
         public bool IsActionsShowing { get; set; }
 
-        public FloatingButtonFlow Flow { get; set; } = FloatingButtonFlow.Top;
+        public FloatingButtonFlow Flow { get; set; }
 
-        public FloatingButton() { Actions = new List<Action>(); Visible = IsInitializedWithMarkup = true; }
+        public FloatingButton() : this(FloatingButtonFlow.Up) { }
 
         public FloatingButton(FloatingButtonFlow flow, params Action[] actionItems)
         {
             Flow = flow;
-            Actions = new List<Action>(actionItems);
-            Visible = true;
+            Actions.AddRange(actionItems);
+            ClipChildren = false;
+        }
+
+        Animation DefaultAnimationFactory(System.Action action)
+        {
+            return new Animation
+            {
+                Change = action,
+                Duration = 100.Milliseconds(),
+                Easing = AnimationEasing.EaseInOut
+            };
         }
 
         public virtual async Task Show()
         {
-            UpdatePosition();
             if (IsShowing) return;
 
             if (Parent != null && Parent.AllChildren.Contains(this))
@@ -41,9 +60,7 @@
                     await Nav.CurrentPage.Add(this);
             }
 
-            if (Actions != null && Actions.Any())
-                Tapped.Handle(ShowActions);
-
+            await this.BringToFront();
             IsShowing = true;
         }
 
@@ -57,67 +74,63 @@
 
         public async Task ShowActions()
         {
-            if (IsActionsShowing)
-            {
-                await HideActions();
-                return;
-            }
-
-            float lastItemTop = 0, lastItemLeft = 0;
-
-            if (!IsInitializedWithMarkup)
-            {
-                lastItemTop = Y.CurrentValue;
-                lastItemLeft = X.CurrentValue;
-            }
+            if (IsActionsShowing) return;
 
             var animations = new List<Task>();
 
-            foreach (var actionItem in Actions)
+            foreach (var action in Actions)
             {
-                actionItem.ZIndex(ZIndex - 1);
-                if (!IsInitializedWithMarkup)
-                {
-                    actionItem.Y(Y.CurrentValue);
-                    actionItem.X(X.CurrentValue);
-                }
+                if (action.Parent == null)
+                    await Add(action);
 
-                if (actionItem.Parent == null)
-                    await Nav.CurrentPage.Add(actionItem);
+                ResetActionPosition(action);
+
+                await action.BringToFront();
+
+                var x = action.ActualX;
+                var y = action.ActualY;
+                var oneBaseIndex = Actions.IndexOf(action) + 1;
 
                 switch (Flow)
                 {
-                    case FloatingButtonFlow.Top:
-                        lastItemTop -= actionItem.ActualHeight + CONTAINER_MARGIN;
+                    case FloatingButtonFlow.Up:
+                        y = -(action.ActualHeight + ActionsPadding) * oneBaseIndex;
                         break;
+
                     case FloatingButtonFlow.Right:
-                        lastItemLeft += actionItem.ActualWidth + CONTAINER_MARGIN;
+                        x += this.ActualWidth + (action.ActualWidth + ActionsPadding) * oneBaseIndex;
                         break;
-                    case FloatingButtonFlow.Bottom:
-                        lastItemTop += actionItem.ActualHeight + CONTAINER_MARGIN;
+
+                    case FloatingButtonFlow.Down:
+                        y = this.ActualHeight + (action.ActualHeight + ActionsPadding) * oneBaseIndex;
                         break;
+
                     case FloatingButtonFlow.Left:
-                        lastItemLeft -= actionItem.ActualWidth + CONTAINER_MARGIN;
+                        x += -(action.ActualWidth + ActionsPadding) * oneBaseIndex;
                         break;
+
                     default:
                         break;
                 }
 
-                actionItem.X(lastItemLeft).Y(lastItemTop).ScaleX(0).ScaleY(0);
-                var animation = new Animation
+                animations.Add(action.Animate(AnimationFactory(() =>
                 {
-                    Change = () => actionItem.ScaleX(1).ScaleY(1),
-                    Duration = 100.Milliseconds(),
-                    Easing = AnimationEasing.EaseInOut
-                };
-
-                animations.Add(actionItem.Animate(animation));
-                actionItem.Visible = true;
+                    action.X(x);
+                    action.Y(y);
+                    action.Opacity(1);
+                })));
             }
-
             await Task.WhenAll(animations);
+            await this.BringToFront();
 
             IsActionsShowing = true;
+        }
+
+        void ResetActionPosition(Action action)
+        {
+            action.Opacity(0)
+                .X((ActualWidth - action.ActualWidth) / 2)
+                .Y((ActualHeight - action.ActualHeight) / 2);
         }
 
         public async Task HideActions()
@@ -126,11 +139,8 @@
 
             var animations = new List<Task>();
 
-            foreach (var actionItem in Actions)
-            {
-                animations.Add(actionItem.Animate(100.Milliseconds(), AnimationEasing.EaseInOut, child => child.ScaleX(0).ScaleY(0))
-                      .ContinueWith((a) => actionItem.Visible = false));
-            }
+            foreach (var action in Actions)
+                animations.Add(action.Animate(AnimationFactory(() => ResetActionPosition(action))));
 
             await Task.WhenAll(animations);
 
@@ -139,17 +149,29 @@
 
         public override async Task OnInitialized()
         {
+            await this.On(x => x.Tapped, TappedHandler).SetPosition(Position);
+
             await base.OnInitialized();
 
-            if (IsInitializedWithMarkup)
+            if (Parent != null)
                 await Show();
         }
 
-        public override async Task<TView> Add<TView>(TView child, bool awaitNative = false)
+        Task TappedHandler()
         {
-            var result = await base.Add(child, awaitNative);
+            if (Actions.Count == 0) return Task.CompletedTask;
+
+            if (IsActionsShowing)
+                return HideActions();
+            else
+                return ShowActions();
+        }
+
+        public override async Task<TView> AddAt<TView>(int index, TView child, bool awaitNative = false)
+        {
+            var result = await base.AddAt(index, child, awaitNative);
             var actionButton = result as Action;
-            if (actionButton != null)
+            if (actionButton != null && Actions.Lacks(actionButton))
                 Actions.Add(actionButton);
 
             return result;

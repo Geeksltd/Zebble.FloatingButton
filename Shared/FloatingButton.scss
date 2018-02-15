@@ -1,19 +1,57 @@
-﻿FloatingButton {
-    border-radius: 56px;
-    border-width: 1px;
-    border-color: transparent;
-    background-color: hotpink;
-    width: 56px;
-    height: 56px;
-    padding: 17px;
+﻿$action-size: 50px;
+
+$button-size: 60px;
+$padding: 30px;
+$bottom-nav-bar: 56px;
+$top-nav-bar: 0;
+
+$c-button-size: 60;
+$c-padding: 30;
+$c-bottom-nav-bar: 56;
+$c-top-nav-bar: 0;
+
+@mixin set-size($size) {
+    height: $size;
+    width: $size;
+    border-radius: $size / 2;
 }
 
-FloatingButton-Action {
-    border-radius: 56px;
-    border-width: 1px;
-    border-color: transparent;
-    background-color: hotpink;
-    width: 56px;
-    height: 56px;
-    padding: 17px;
+@mixin floating-button() {
+    FloatingButton-Action {
+        @include set-size($action-size);
+        background-color: lightcoral;
+        padding: $action-size / 4;
+
+        > ImageView {
+            height: $action-size / 2;
+            width: $action-size / 2;
+        }
+    }
+
+    FloatingButton {
+        @include set-size($button-size);
+        background-color: hotpink;
+        padding: $button-size / 4;
+
+        > ImageView {
+            height: $button-size / 2;
+            width: $button-size / 2;
+        }
+    }
+
+    FloatingButton.right {
+        left: calc("View.Root.Width, x => x - #{$c-button-size} - #{$c-padding}");
+    }
+
+    FloatingButton.bottom {
+        top: calc("View.Root.Height, x => x - #{$c-padding} - #{$c-button-size} - #{$c-bottom-nav-bar}");
+    }
+
+    FloatingButton.left {
+        left: $padding;
+    }
+
+    FloatingButton.top {
+        top: $padding + $top-nav-bar;
+    }
 }

@@ -5,9 +5,9 @@
     /// </summary>
     public enum FloatingButtonFlow
     {
-        Top,
+        Up,
         Right,
-        Bottom,
+        Down,
         Left
     }
 }

@@ -4,7 +4,6 @@
     {
         public partial class Action : BaseFloatingButton
         {
-            public Action() { Position = FloatingButtonPosition.Custom; }
         }
     }
 }
