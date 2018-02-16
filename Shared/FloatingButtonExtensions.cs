@@ -14,9 +14,9 @@
         public static async Task<TView> SetPosition<TView>(this TView view, FloatingButtonPosition value) where TView : FloatingButton
         {
             view.Position = value;
-            var temp = view.CssClass;
+            var cssClass = view.CssClass;
 
-            temp = temp.KeepReplacing(Top, "")
+            cssClass = cssClass.KeepReplacing(Top, "")
                 .KeepReplacing(Right, "")
                 .KeepReplacing(Bottom, "")
                 .KeepReplacing(Left, "");
@@ -24,23 +24,23 @@
             switch (value)
             {
                 case FloatingButtonPosition.TopRight:
-                    temp += $" {Top} {Right}";
+                    cssClass += $" {Top} {Right}";
                     break;
 
                 case FloatingButtonPosition.TopLeft:
-                    temp += $" {Top} {Right}";
+                    cssClass += $" {Top} {Right}";
                     break;
 
                 case FloatingButtonPosition.BottomRight:
-                    temp += $" {Bottom} {Right}";
+                    cssClass += $" {Bottom} {Right}";
                     break;
 
                 case FloatingButtonPosition.BottomLeft:
-                    temp += $" {Bottom} {Left}";
+                    cssClass += $" {Bottom} {Left}";
                     break;
             }
 
-            await view.SetCssClass(temp);
+            await view.SetCssClass(cssClass);
 
             return view;
         }

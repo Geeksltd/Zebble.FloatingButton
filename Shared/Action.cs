@@ -2,7 +2,7 @@
 {
     partial class FloatingButton
     {
-        public partial class Action : BaseFloatingButton
+        public class Action : BaseFloatingButton
         {
         }
     }

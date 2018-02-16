@@ -1,7 +1,5 @@
 ﻿namespace Zebble
 {
-    using System;
-    using System.Linq;
     using System.Threading.Tasks;
 
     public abstract class BaseFloatingButton : Canvas
@@ -10,7 +8,7 @@
 
         public string ImagePath
         {
-            get { return ImageView.Path; }
+            get => ImageView.Path;
             set
             {
                 if (ImageView.Path != value) ImageView.Path = value;

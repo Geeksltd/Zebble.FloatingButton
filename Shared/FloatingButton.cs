@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
 
     public partial class FloatingButton : BaseFloatingButton
@@ -60,7 +59,7 @@
                     await Nav.CurrentPage.Add(this);
             }
 
-            await this.BringToFront();
+            await BringToFront();
             IsShowing = true;
         }
 
@@ -98,18 +97,15 @@
                         break;
 
                     case FloatingButtonFlow.Right:
-                        x += this.ActualWidth + (action.ActualWidth + ActionsPadding) * oneBaseIndex;
+                        x += ActualWidth + (action.ActualWidth + ActionsPadding) * oneBaseIndex;
                         break;
 
                     case FloatingButtonFlow.Down:
-                        y = this.ActualHeight + (action.ActualHeight + ActionsPadding) * oneBaseIndex;
+                        y = ActualHeight + (action.ActualHeight + ActionsPadding) * oneBaseIndex;
                         break;
 
                     case FloatingButtonFlow.Left:
                         x += -(action.ActualWidth + ActionsPadding) * oneBaseIndex;
-                        break;
-
-                    default:
                         break;
                 }
 
@@ -120,8 +116,9 @@
                     action.Opacity(1);
                 })));
             }
+
             await Task.WhenAll(animations);
-            await this.BringToFront();
+            await BringToFront();
 
             IsActionsShowing = true;
         }
@@ -163,8 +160,8 @@
 
             if (IsActionsShowing)
                 return HideActions();
-            else
-                return ShowActions();
+            
+            return ShowActions();
         }
 
         public override async Task<TView> AddAt<TView>(int index, TView child, bool awaitNative = false)
