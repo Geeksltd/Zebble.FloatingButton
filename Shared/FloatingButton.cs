@@ -19,6 +19,7 @@
             set => animationFactory = value;
         }
 
+        // TODO: Remove
         public int ActionsPadding { get; set; } = 10;
 
         public bool IsShowing { get; set; }
@@ -83,8 +84,10 @@
 
             var animations = new List<Task>();
 
-            foreach (var action in Actions)
+            for(var index = 0; index < Actions.Count; index++)
             {
+                var action = Actions[index];
+
                 if (action.Parent == null)
                     await Add(action);
 
@@ -94,24 +97,23 @@
 
                 var x = action.ActualX;
                 var y = action.ActualY;
-                var oneBaseIndex = Actions.IndexOf(action) + 1;
 
                 switch (Flow)
                 {
                     case FloatingButtonFlow.Up:
-                        y = -(action.ActualHeight + ActionsPadding) * oneBaseIndex;
+                        y = -(action.ActualHeight + ActionsPadding) * index;
                         break;
 
                     case FloatingButtonFlow.Right:
-                        x += ActualWidth + (action.ActualWidth + ActionsPadding) * oneBaseIndex;
+                        x += ActualWidth + (action.ActualWidth + ActionsPadding) * index;
                         break;
-
+                
                     case FloatingButtonFlow.Down:
-                        y = ActualHeight + (action.ActualHeight + ActionsPadding) * oneBaseIndex;
+                        y = ActualHeight + (action.ActualHeight + ActionsPadding) * index;
                         break;
 
                     case FloatingButtonFlow.Left:
-                        x += -(action.ActualWidth + ActionsPadding) * oneBaseIndex;
+                        x += -(action.ActualWidth + ActionsPadding) * index;
                         break;
                 }
 

@@ -5,6 +5,7 @@
     public abstract class BaseFloatingButton : Canvas
     {
         readonly ImageView ImageView = new ImageView();
+        protected readonly Canvas MainButton = new Canvas().Id("MainButton");
 
         public string ImagePath
         {
@@ -19,6 +20,7 @@
         {
             await base.OnInitializing();
 
+            await MainButton.Add(ImageView);
             await Add(ImageView);
         }
     }
