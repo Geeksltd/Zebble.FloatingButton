@@ -17,7 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Action.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonFlow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatingButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatingButtonPosition.cs" />

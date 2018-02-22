@@ -6,6 +6,8 @@
 
     public partial class FloatingButton : BaseFloatingButton
     {
+        Overlay OverlayElement;
+
         public List<Action> Actions { get; set; } = new List<Action>();
 
         public FloatingButtonPosition Position { get; set; } = FloatingButtonPosition.Custom;
@@ -26,6 +28,8 @@
 
         public FloatingButtonFlow Flow { get; set; }
 
+        public bool Overlay { get; set; }
+
         public FloatingButton() : this(FloatingButtonFlow.Up) { }
 
         public FloatingButton(FloatingButtonFlow flow, params Action[] actionItems)
@@ -33,6 +37,7 @@
             Flow = flow;
             Actions.AddRange(actionItems);
             ClipChildren = false;
+            OverlayElement = new Overlay();
         }
 
         Animation DefaultAnimationFactory(System.Action action)
@@ -67,6 +72,7 @@
         {
             if (!IsShowing) return;
 
+            OverlayElement.Visible = false;
             Visible = false;
             IsShowing = false;
         }
@@ -74,6 +80,15 @@
         public async Task ShowActions()
         {
             if (IsActionsShowing) return;
+
+            if (Overlay)
+            {
+                await Root.Add(OverlayElement);
+
+                await OverlayElement.BringToFront();
+                await BringToFront();
+                await OverlayElement.Animate(Animation.FadeDuration, x => x.Opacity(0.5f));
+            }
 
             var animations = new List<Task>();
 
@@ -133,6 +148,12 @@
         public async Task HideActions()
         {
             if (!IsActionsShowing) return;
+
+            if (Overlay)
+            {
+                OverlayElement.Opacity = 0;
+                OverlayElement.Visible = false;
+            }
 
             var animations = new List<Task>();
 

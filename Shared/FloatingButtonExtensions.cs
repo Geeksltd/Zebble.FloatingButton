@@ -6,12 +6,13 @@
     [EscapeGCop("Method names are fine")]
     public static class FloatingButtonExtensions
     {
-        static string Top = "top";
-        static string Right = "right";
-        static string Bottom = "bottom";
-        static string Left = "left";
+        static readonly string Top = "top";
+        static readonly string Right = "right";
+        static readonly string Bottom = "bottom";
+        static readonly string Left = "left";
 
-        public static async Task<TView> SetPosition<TView>(this TView view, FloatingButtonPosition value) where TView : FloatingButton
+        public static async Task<TView> SetPosition<TView>(this TView view, FloatingButtonPosition value)
+            where TView : FloatingButton
         {
             view.Position = value;
             var cssClass = view.CssClass;

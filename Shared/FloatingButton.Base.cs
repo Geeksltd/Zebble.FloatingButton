@@ -18,7 +18,7 @@
         public override async Task OnInitializing()
         {
             await base.OnInitializing();
-            
+
             await Add(ImageView);
         }
     }

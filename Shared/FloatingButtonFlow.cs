@@ -1,7 +1,7 @@
 ﻿namespace Zebble
 {
     /// <summary>
-    /// The Direction in which Actions will be displayed
+    ///     The Direction in which Actions will be displayed
     /// </summary>
     public enum FloatingButtonFlow
     {
