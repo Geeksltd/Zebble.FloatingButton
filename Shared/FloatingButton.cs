@@ -6,13 +6,12 @@
 
     public partial class FloatingButton : BaseFloatingButton
     {
-        Overlay OverlayElement;
+        readonly Overlay overlay;
+        Func<System.Action, Animation> animationFactory;
 
         public List<Action> Actions { get; set; } = new List<Action>();
 
-        public FloatingButtonPosition Position { get; set; } = FloatingButtonPosition.Custom;
-
-        Func<System.Action, Animation> animationFactory;
+        public FloatingButtonPosition Position { get; set; } = FloatingButtonPosition.BottomRight;
 
         public Func<System.Action, Animation> AnimationFactory
         {
@@ -28,26 +27,18 @@
 
         public FloatingButtonFlow Flow { get; set; }
 
-        public bool Overlay { get; set; }
+        public bool EnableOverlay { get; set; }
 
-        public FloatingButton() : this(FloatingButtonFlow.Up) { }
+        public FloatingButton() : this(FloatingButtonFlow.Up)
+        {
+        }
 
         public FloatingButton(FloatingButtonFlow flow, params Action[] actionItems)
         {
             Flow = flow;
             Actions.AddRange(actionItems);
             ClipChildren = false;
-            OverlayElement = new Overlay();
-        }
-
-        Animation DefaultAnimationFactory(System.Action action)
-        {
-            return new Animation
-            {
-                Change = action,
-                Duration = 100.Milliseconds(),
-                Easing = AnimationEasing.EaseInOut
-            };
+            overlay = new Overlay();
         }
 
         public virtual async Task Show()
@@ -72,7 +63,7 @@
         {
             if (!IsShowing) return;
 
-            OverlayElement.Visible = false;
+            overlay.Visible = false;
             Visible = false;
             IsShowing = false;
         }
@@ -81,13 +72,13 @@
         {
             if (IsActionsShowing) return;
 
-            if (Overlay)
+            if (EnableOverlay)
             {
-                await Root.Add(OverlayElement);
+                await Root.Add(overlay);
 
-                await OverlayElement.BringToFront();
+                await overlay.BringToFront();
                 await BringToFront();
-                await OverlayElement.Animate(Animation.FadeDuration, x => x.Opacity(0.5f));
+                await overlay.Animate(Animation.FadeDuration, x => x.Opacity(0.5f));
             }
 
             var animations = new List<Task>();
@@ -138,21 +129,14 @@
             IsActionsShowing = true;
         }
 
-        void ResetActionPosition(Action action)
-        {
-            action.Opacity(0)
-                .X((ActualWidth - action.ActualWidth) / 2)
-                .Y((ActualHeight - action.ActualHeight) / 2);
-        }
-
         public async Task HideActions()
         {
             if (!IsActionsShowing) return;
 
-            if (Overlay)
+            if (EnableOverlay)
             {
-                OverlayElement.Opacity = 0;
-                OverlayElement.Visible = false;
+                overlay.Opacity = 0;
+                overlay.Visible = false;
             }
 
             var animations = new List<Task>();
@@ -175,16 +159,6 @@
                 await Show();
         }
 
-        Task TappedHandler()
-        {
-            if (Actions.Count == 0) return Task.CompletedTask;
-
-            if (IsActionsShowing)
-                return HideActions();
-            
-            return ShowActions();
-        }
-
         public override async Task<TView> AddAt<TView>(int index, TView child, bool awaitNative = false)
         {
             var result = await base.AddAt(index, child, awaitNative);
@@ -193,6 +167,33 @@
                 Actions.Add(actionButton);
 
             return result;
+        }
+
+        Animation DefaultAnimationFactory(System.Action action)
+        {
+            return new Animation
+            {
+                Change = action,
+                Duration = 100.Milliseconds(),
+                Easing = AnimationEasing.EaseInOut
+            };
+        }
+
+        void ResetActionPosition(Action action)
+        {
+            action.Opacity(0)
+                .X((ActualWidth - action.ActualWidth) / 2)
+                .Y((ActualHeight - action.ActualHeight) / 2);
+        }
+
+        Task TappedHandler()
+        {
+            if (Actions.Count == 0) return Task.CompletedTask;
+
+            if (IsActionsShowing)
+                return HideActions();
+
+            return ShowActions();
         }
     }
 }
