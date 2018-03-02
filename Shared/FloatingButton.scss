@@ -10,32 +10,45 @@ $c-padding: 30;
 $c-bottom-nav-bar: 56;
 $c-top-nav-bar: 0;
 
-@mixin set-size($size) {
+@mixin circle($size) {
     height: $size;
     width: $size;
     border-radius: $size / 2;
 }
 
 @mixin floating-button() {
-    FloatingButton-Action {
-        @include set-size($action-size);
-        background-color: lightcoral;
-        padding: $action-size / 4;
+    #Overlay {
+        opacity: 0;
+        background-color: white;
+        width: 100vw;
+        height: 100vh;
+    }
 
-        > ImageView {
-            height: $action-size / 2;
-            width: $action-size / 2;
+    FloatingButton, FloatingButton-Action {
+        Stack {
+            width: 105px;
+        }
+
+        #ImageWrapper {
+            @include circle($action-size);
+            padding: $action-size / 4;
+
+            > ImageView {
+                height: $action-size / 2;
+                width: $action-size / 2;
+            }
         }
     }
 
     FloatingButton {
-        @include set-size($button-size);
-        background-color: hotpink;
-        padding: $button-size / 4;
+        #ImageWrapper {
+            background-color: hotpink;
+        }
+    }
 
-        > ImageView {
-            height: $button-size / 2;
-            width: $button-size / 2;
+    FloatingButton-Action {
+        #ImageWrapper {
+            background-color: lightcoral;
         }
     }
 

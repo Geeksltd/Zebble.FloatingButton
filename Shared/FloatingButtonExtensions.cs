@@ -29,7 +29,7 @@
                     break;
 
                 case FloatingButtonPosition.TopLeft:
-                    cssClass += $" {Top} {Right}";
+                    cssClass += $" {Top} {Left}";
                     break;
 
                 case FloatingButtonPosition.BottomRight:

@@ -8,6 +8,7 @@
         Up,
         Right,
         Down,
-        Left
+        Left,
+        ScaleUp
     }
 }

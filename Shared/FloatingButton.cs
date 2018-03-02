@@ -19,7 +19,6 @@
             set => animationFactory = value;
         }
 
-        // TODO: Remove
         public int ActionsPadding { get; set; } = 10;
 
         public bool IsShowing { get; set; }
@@ -40,6 +39,7 @@
             Actions.AddRange(actionItems);
             ClipChildren = false;
             overlay = new Overlay();
+            overlay.Tapped.Handle(OverlayTapped);
         }
 
         public virtual async Task Show()
@@ -73,59 +73,25 @@
         {
             if (IsActionsShowing) return;
 
+            var tasks = new List<Task>();
+
             if (EnableOverlay)
             {
-                await Root.Add(overlay);
+                if (Nav.CurrentPage.AllChildren.Contains(overlay))
+                    overlay.Visible = true;
+                else
+                    await Nav.CurrentPage.Add(overlay);
 
                 await overlay.BringToFront();
-                await BringToFront();
-                await overlay.Animate(Animation.FadeDuration, x => x.Opacity(0.5f));
+                tasks.Add(overlay.Animate(Animation.FadeDuration, x => x.Opacity(0.5f)));
             }
 
-            var animations = new List<Task>();
+            tasks.Add(this.Animate(Animation.FadeDuration, x => x.Visible(false)));
 
-            for(var index = 0; index < Actions.Count; index++)
-            {
-                var action = Actions[index];
-
-                if (action.Parent == null)
-                    await Add(action);
-
-                ResetActionPosition(action);
-
-                await action.BringToFront();
-
-                var x = action.ActualX;
-                var y = action.ActualY;
-
-                switch (Flow)
-                {
-                    case FloatingButtonFlow.Up:
-                        y = -(action.ActualHeight + ActionsPadding) * index;
-                        break;
-
-                    case FloatingButtonFlow.Right:
-                        x += ActualWidth + (action.ActualWidth + ActionsPadding) * index;
-                        break;
+            var animations = new Animations(Flow, Actions, this);
+            tasks.AddRange(await animations.GetShowAnimations());
                 
-                    case FloatingButtonFlow.Down:
-                        y = ActualHeight + (action.ActualHeight + ActionsPadding) * index;
-                        break;
-
-                    case FloatingButtonFlow.Left:
-                        x += -(action.ActualWidth + ActionsPadding) * index;
-                        break;
-                }
-
-                animations.Add(action.Animate(AnimationFactory(() =>
-                {
-                    action.X(x);
-                    action.Y(y);
-                    action.Opacity(1);
-                })));
-            }
-
-            await Task.WhenAll(animations);
+            await Task.WhenAll(tasks);
             await BringToFront();
 
             IsActionsShowing = true;
@@ -141,12 +107,11 @@
                 overlay.Visible = false;
             }
 
-            var animations = new List<Task>();
+            var animations = new Animations(Flow, Actions, this);
+            var tasks = animations.GetHideAnimations();
+            tasks.Add(this.Animate(Animation.FadeDuration, x => x.Visible(true)));
 
-            foreach (var action in Actions)
-                animations.Add(action.Animate(AnimationFactory(() => ResetActionPosition(action))));
-
-            await Task.WhenAll(animations);
+            await Task.WhenAll(tasks);
 
             IsActionsShowing = false;
         }
@@ -181,13 +146,6 @@
             };
         }
 
-        void ResetActionPosition(Action action)
-        {
-            action.Opacity(0)
-                .X((ActualWidth - action.ActualWidth) / 2)
-                .Y((ActualHeight - action.ActualHeight) / 2);
-        }
-
         Task TappedHandler()
         {
             if (Actions.Count == 0) return Task.CompletedTask;
@@ -196,6 +154,11 @@
                 return HideActions();
 
             return ShowActions();
+        }
+
+        Task OverlayTapped(TouchEventArgs arg)
+        {
+            return HideActions();
         }
     }
 }
