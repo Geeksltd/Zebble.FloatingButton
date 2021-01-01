@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
+    using Olive;
 
     [EscapeGCop("Method names are fine")]
     public static class FloatingButtonExtensions

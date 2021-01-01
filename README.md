@@ -1,4 +1,4 @@
-[logo]: https://raw.githubusercontent.com/Geeksltd/Zebble.FloatingButton/master/Shared/NuGet/Icon.png "Zebble.FloatingButton"
+ï»¿[logo]: https://raw.githubusercontent.com/Geeksltd/Zebble.FloatingButton/master/icon.png "Zebble.FloatingButton"
 
 
 ## Zebble.FloatingButton
@@ -10,7 +10,7 @@ A plugin to add floating action buttons in Zebble applications.
 
 [![NuGet](https://img.shields.io/nuget/v/Zebble.FloatingButton.svg?label=NuGet)](https://www.nuget.org/packages/Zebble.FloatingButton/)
 
-> Floating action buttons (or FAB) are: “A special case of promoted actions. They are distinguished by a circled icon floating above the UI and have special motion behaviors, related to morphing, launching, and its transferring anchor point.”
+> Floating action buttons (or FAB) are: ï¿½A special case of promoted actions. They are distinguished by a circled icon floating above the UI and have special motion behaviors, related to morphing, launching, and its transferring anchor point.ï¿½
 
 <br>
 

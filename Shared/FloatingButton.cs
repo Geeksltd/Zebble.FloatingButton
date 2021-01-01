@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Olive;
 
     public partial class FloatingButton : BaseFloatingButton
     {
@@ -48,25 +49,25 @@
 
             if (Parent != null && Parent.AllChildren.Contains(this))
                 Visible = true;
+            else if (Nav.CurrentPage.AllChildren.Contains(this))
+                Visible = true;
             else
-            {
-                if (Nav.CurrentPage.AllChildren.Contains(this))
-                    Visible = true;
-                else
-                    await Nav.CurrentPage.Add(this);
-            }
+                await Nav.CurrentPage.Add(this);
 
             await BringToFront();
             IsShowing = true;
         }
 
-        public virtual async Task Hide()
+        public virtual Task Hide()
         {
-            if (!IsShowing) return;
+            if (IsShowing)
+            {
+                overlay.Visible = false;
+                Visible = false;
+                IsShowing = false;
+            }
 
-            overlay.Visible = false;
-            Visible = false;
-            IsShowing = false;
+            return Task.CompletedTask;
         }
 
         public async Task ShowActions()
@@ -90,7 +91,7 @@
 
             var animations = new Animations(Flow, Actions, this);
             tasks.AddRange(await animations.GetShowAnimations());
-                
+
             await Task.WhenAll(tasks);
             await BringToFront();
 
@@ -129,8 +130,7 @@
         public override async Task<TView> AddAt<TView>(int index, TView child, bool awaitNative = false)
         {
             var result = await base.AddAt(index, child, awaitNative);
-            var actionButton = result as Action;
-            if (actionButton != null && Actions.Lacks(actionButton))
+            if (result is Action actionButton && Actions.Lacks(actionButton))
                 Actions.Add(actionButton);
 
             return result;
@@ -148,7 +148,7 @@
 
         Task TappedHandler()
         {
-            if (Actions.Count == 0) return Task.CompletedTask;
+            if (Actions.None()) return Task.CompletedTask;
 
             if (IsActionsShowing)
                 return HideActions();

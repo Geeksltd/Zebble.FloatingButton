@@ -1,13 +1,14 @@
 ﻿namespace Zebble
 {
     using System.Threading.Tasks;
+    using Olive;
 
     public abstract class BaseFloatingButton : Canvas
     {
         internal readonly Canvas imageWrapper = new Canvas();
         internal readonly ImageView imageView = new ImageView();
         internal readonly TextView textView = new TextView();
-        internal readonly Stack stack = new Stack {Direction = RepeatDirection.Horizontal, HorizontalAlignment = HorizontalAlignment.Right};
+        internal readonly Stack stack = new Stack { Direction = RepeatDirection.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
 
         public string ImagePath
         {
@@ -31,14 +32,14 @@
         {
             await base.OnInitializing();
 
-            this.Width(Length.AutoStartegy.Content);
-            stack.Width(Length.AutoStartegy.Content);
+            this.Width(Length.AutoStrategy.Content);
+            stack.Width(Length.AutoStrategy.Content);
 
             imageWrapper.Id("ImageWrapper");
 
             await Add(stack);
 
-            if (!string.IsNullOrEmpty(Text))
+            if (Text.HasValue())
             {
                 textView.AutoSizeWidth();
                 textView.MiddleAlign();
@@ -49,7 +50,7 @@
             await stack.Add(imageWrapper);
             await imageWrapper.Add(imageView);
 
-            // There is a bug in Zebble with Length.AutoStartegy.Content
+            // There is a bug in Zebble with Length.AutoStrategy.Content
             // These are just temporary workarounds, we can remove these after fixing it
             stack.Width.BindTo(imageWrapper.Width, textView.Width, (iw, tv) => iw + tv);
             Width.BindTo(stack.Width);
